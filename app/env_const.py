@@ -1,0 +1,21 @@
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+class EnviromentVariables:
+    _URL = os.environ.get('URL')
+    _LOGIN = os.environ.get('LOGIN')
+    _PASSWORD = os.environ.get('PASSWORD')
+
+    @classmethod
+    def get_url(cls):
+        return cls._URL
+    
+    @classmethod
+    def get_login(cls):
+        return cls._LOGIN
+    
+    @classmethod
+    def get_password(cls):
+        return cls._PASSWORD
