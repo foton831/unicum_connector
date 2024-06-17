@@ -1,4 +1,5 @@
 import requests
+import logging
 from env_const import EnviromentVariables as ev
 from models import Authentificator as auth
 
@@ -20,9 +21,9 @@ def getmachines():
             set_token_from_result(result=result)
             return result
         else:
-            print(f"Ошибка при выполнении запроса getmachines: {response.status_code}")
+            logging.error(f"Ошибка при выполнении запроса getmachines: {response.status_code}")
     except requests.RequestException as e:
-        print(f"Ошибка при выполнении запроса getmachines: {e}")
+        logging.error(f"Ошибка при выполнении запроса getmachines: {e}")
     return None
 
 def curstate(guid):        
@@ -46,9 +47,9 @@ def curstate(guid):
             set_token_from_result(result=result)
             return result
         else:
-            print(f"Ошибка при выполнении запроса curstate: {response.status_code}")
+            logging.error(f"Ошибка при выполнении запроса curstate : {response.status_code}, guid = {guid}")
     except requests.RequestException as e:
-        print(f"Ошибка при выполнении запроса curstate: {e}")
+        logging.error(f"Ошибка при выполнении запроса curstate: {e}")
     return None
 
 def set_token_from_result(result):
@@ -63,4 +64,4 @@ def set_token_from_result(result):
         if token is not None:
             auth.set_token(token)
     except Exception as e:
-        print(f"Ошибка в set_token_from_result: {e}")
+        logging.error(f"Ошибка в set_token_from_result: {e}")
