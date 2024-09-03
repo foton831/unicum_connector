@@ -29,7 +29,7 @@ class Authentificator:
             'password': ev.get_password()
         } 
         try:
-            response = requests.post(f'{ev.get_url()}/wjson/iamrobot.json', json=data)
+            response = requests.post(f'{ev.get_url()}/wjson/iamrobot.json', json=data, timeout=30)
             if response.status_code == 200:
                 token = response.json().get('token')
                 if token:

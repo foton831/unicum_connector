@@ -15,7 +15,7 @@ def getmachines():
         'subcompanies': True
     }
     try:
-        response = requests.post(f'{ev.get_url()}/wjson/getmachines.json', json=data)
+        response = requests.post(f'{ev.get_url()}/wjson/getmachines.json', json=data, timeout=30)
         if response.status_code == 200:            
             result = response.json()
             set_token_from_result(result=result)
@@ -41,7 +41,7 @@ def curstate(guid):
         "machineguid": guid
     }
     try:
-        response = requests.post(f'{ev.get_url()}/wjson/curstate.json', json=data)
+        response = requests.post(f'{ev.get_url()}/wjson/curstate.json', json=data, timeout=30)
         if response.status_code == 200:
             result = response.json()
             set_token_from_result(result=result)

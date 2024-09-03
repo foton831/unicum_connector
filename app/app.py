@@ -1,23 +1,35 @@
 from flask import Flask, request, jsonify
+import logging
 from datetime import datetime
-import time
-# from apscheduler.schedulers.background import BackgroundScheduler
-from env_const import EnviromentVariables as ev
+from apscheduler.schedulers.background import BackgroundScheduler
 from models import Authentificator as auth
-from curstate import curstate_task, select_all_curstate
-
-import multiprocessing as mp
+from curstate import curstate_task, select_all_curstate, select_all_tubes
 
 app = Flask(__name__)
 
-# scheduler = BackgroundScheduler()
-# # Запуск расписания задач перед обработкой запросов
-# @app.before_request 
-# def start_scheduler():    
-#     if not scheduler.running:
-#         scheduler.add_job(auth.get_token, 'interval', minutes=20)
-#         scheduler.add_job(curstate_task, 'interval', minutes=ev.get_curstate_update_interval())        
-#         scheduler.start()
+scheduler = BackgroundScheduler()
+
+def start_scheduler():
+    curstate_task()
+    scheduler.add_job(curstate_task, 'cron', minute='*/2')
+    scheduler.add_job(curstate_task, 'cron', hour='*/2')     
+    scheduler.start()
+
+def restart_scheduler ():
+    global scheduler
+    try: 
+        print('Попытка выключить')
+        scheduler.shutdown(wait=False)
+        scheduler = BackgroundScheduler()
+        start_scheduler()
+    except Exception as e:
+        print('Не удалось')
+
+# Запуск расписания задач перед обработкой запросов
+@app.before_request 
+def before_request():
+    if not scheduler.running:
+        start_scheduler()
 
 # Метод для проверки работоспособности сервера
 @app.route("/health", methods=['GET'])
@@ -37,13 +49,19 @@ def get_token():
 def curstate_monitor():
     return jsonify({"machines":select_all_curstate()})
 
-def curstate_scheduler():    
-    while True:
-      curstate_task()
-      time.sleep(ev.get_curstate_update_interval())      
+# Метод для получения текущего состояния аппараторв
+@app.route('/tubes_monitor', methods=['POST'])
+def tubes_monitor():
+    return jsonify({"machines":select_all_tubes()})
+
+
+# Метод для получения текущего состояния аппараторв
+@app.route('/curstate_update', methods=['POST'])
+def curstate_update():
+    curstate_task()
+    return jsonify({"status":"complete"})
 
 #Запуск сервера
 if __name__ == '__main__':
-    p = mp.Process(target=curstate_scheduler) 
-    p.start()
+    start_scheduler()
     app.run(host='0.0.0.0', port=5000, debug=False)

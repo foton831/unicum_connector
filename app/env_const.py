@@ -7,7 +7,6 @@ class EnviromentVariables:
     _URL = os.environ.get('URL')
     _LOGIN = os.environ.get('LOGIN')
     _PASSWORD = os.environ.get('PASSWORD')
-    _CURSTATE_UPDATE_INTERVAL = os.environ.get('CURSTATE_UPDATE_INTERVAL', '60')
 
     @classmethod
     def get_url(cls):
