@@ -42,7 +42,8 @@ def get_curstate(guid, coins):
                 "state": result.get('state'),
                 "vendscount": result.get('vendscount', 0),
                 "vendscost": result.get('vendscost', 0) / 10 ** result.get('decimal', 2),
-                "empty_cells": len([cell for cell in result.get('products', []) if cell.get('level', 0) == 0]) if result.get('coffee') == False else 0
+                "empty_cells": len([cell for cell in result.get('products', []) if cell.get('level', 0) == 0]) if result.get('coffee') == False else 0,
+                "bills": result.get('bills', 0) / 10 ** result.get('decimal', 2)
             }
             update_curstate(guid=guid, data=data, coins=coins)
     except Exception as e:
@@ -62,8 +63,8 @@ def update_curstate(guid, data, coins):
             cursor.execute("INSERT INTO curstate (guid) VALUES (?)", (guid,))
             conn.commit()
         # Обновляем данные о состоянии машины
-        cursor.execute("UPDATE curstate SET state = ?, vendscount = ?, vendscost = ?, empty_cells = ?, update_datetime = datetime('now', 'localtime'), coin_1 = ?, coin_2 = ?, coin_5 = ?, coin_10 = ? WHERE guid = ?", 
-                       (data.get('state'), data.get('vendscount'), data.get('vendscost'), data.get('empty_cells'),
+        cursor.execute("UPDATE curstate SET state = ?, vendscount = ?, vendscost = ?, empty_cells = ?, bills = ?, update_datetime = datetime('now', 'localtime'), coin_1 = ?, coin_2 = ?, coin_5 = ?, coin_10 = ? WHERE guid = ?", 
+                       (data.get('state'), data.get('vendscount'), data.get('vendscost'), data.get('empty_cells'), data.get('bills'),
                         coins.get('coin_1'), coins.get('coin_2'), coins.get('coin_5'), coins.get('coin_10'),
                         guid))
         conn.commit()
@@ -106,6 +107,7 @@ def select_all_curstate():
                 'vendscount': row['vendscount'],
                 'vendscost': row['vendscost'],
                 'empty_cells': row['empty_cells'],
+                'bills': row['bills'],
                 'update_datetime': row['update_datetime']
             })
         return result

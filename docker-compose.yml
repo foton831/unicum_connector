@@ -1,7 +1,7 @@
 version: '3'
 services:
   unicum_connector:
-    image: foton831/unicumconnector:1.5
+    image: foton831/unicumconnector:1.7
     build: 
       context: .
     ports:
